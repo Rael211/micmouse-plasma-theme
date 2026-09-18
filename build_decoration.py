@@ -20,43 +20,61 @@ def tile(x, y, w, h, eid, parts):
     return '<g id="%s">%s</g>' % (eid, body)
 
 
-def decoration():
-    w, h = 48, 72
+def frame_set(prefix, oy, contour, title_bg, maximized=False):
+    """One complete 9-piece set at vertical canvas offset oy.
+
+    maximized: square corners and no side contour, the way a maximised
+    window meets the screen edge; only the top line is kept."""
+    r = 0 if maximized else 6
     g = []
-    # top row: the titlebar, with the contour along the top and outer sides
-    r = 6
-    g.append('<g id="decoration-topleft">'
-             '<path d="M0,%d L0,%d Q0,0 %d,0 L%d,0 L%d,%d Z" fill="%s"/>'
-             '<path d="M0.5,%d L0.5,%d Q0.5,0.5 %d,0.5 L%d,0.5" fill="none" '
-             'stroke="%s" stroke-width="1"/></g>'
-             % (TITLE_H, r, r, CORNER, CORNER, TITLE_H, TITLE,
-                TITLE_H, r, r, CORNER, ORANGE))
-    g.append(tile(16, 0, TILE, TITLE_H, "decoration-top", [
-        (0, 0, TILE, TITLE_H, TITLE), (0, 0, TILE, 1, ORANGE)]))
-    g.append('<g id="decoration-topright" transform="translate(32,0)">'
-             '<path d="M%d,%d L%d,%d Q%d,0 %d,0 L0,0 L0,%d Z" fill="%s"/>'
-             '<path d="M%g,%d L%g,%d Q%g,0.5 %d,0.5 L0,0.5" fill="none" '
-             'stroke="%s" stroke-width="1"/></g>'
-             % (CORNER, TITLE_H, CORNER, r, CORNER, CORNER - r, TITLE_H, TITLE,
-                CORNER - 0.5, TITLE_H, CORNER - 0.5, r, CORNER - 0.5, CORNER - r, ORANGE))
-    # middle row: side borders, transparent centre where the client draws
-    g.append(tile(0, 40, EDGE, TILE, "decoration-left", [
-        (0, 0, EDGE, TILE, BLACK), (0, 0, 1, TILE, ORANGE)]))
-    g.append('<g id="decoration-center"><rect x="16" y="40" width="%d" height="%d" '
-             'fill="none" fill-opacity="0"/></g>' % (TILE, TILE))
-    g.append(tile(32, 40, EDGE, TILE, "decoration-right", [
-        (0, 0, EDGE, TILE, BLACK), (EDGE - 1, 0, 1, TILE, ORANGE)]))
-    # bottom row
-    g.append(tile(0, 56, CORNER, EDGE, "decoration-bottomleft", [
-        (0, 0, CORNER, EDGE, BLACK), (0, EDGE - 1, CORNER, 1, ORANGE), (0, 0, 1, EDGE, ORANGE)]))
-    g.append(tile(16, 56, TILE, EDGE, "decoration-bottom", [
-        (0, 0, TILE, EDGE, BLACK), (0, EDGE - 1, TILE, 1, ORANGE)]))
-    g.append(tile(32, 56, CORNER, EDGE, "decoration-bottomright", [
-        (0, 0, CORNER, EDGE, BLACK), (0, EDGE - 1, CORNER, 1, ORANGE),
-        (CORNER - 1, 0, 1, EDGE, ORANGE)]))
+    if maximized:
+        g.append(tile(0, oy, CORNER, TITLE_H, prefix + "-topleft", [
+            (0, 0, CORNER, TITLE_H, title_bg), (0, 0, CORNER, 1, contour)]))
+        g.append(tile(32, oy, CORNER, TITLE_H, prefix + "-topright", [
+            (0, 0, CORNER, TITLE_H, title_bg), (0, 0, CORNER, 1, contour)]))
+    else:
+        g.append('<g id="%s-topleft" transform="translate(0,%d)">'
+                 '<path d="M0,%d L0,%d Q0,0 %d,0 L%d,0 L%d,%d Z" fill="%s"/>'
+                 '<path d="M0.5,%d L0.5,%d Q0.5,0.5 %d,0.5 L%d,0.5" fill="none" '
+                 'stroke="%s" stroke-width="1"/></g>'
+                 % (prefix, oy, TITLE_H, r, r, CORNER, CORNER, TITLE_H, title_bg,
+                    TITLE_H, r, r, CORNER, contour))
+        g.append('<g id="%s-topright" transform="translate(32,%d)">'
+                 '<path d="M%d,%d L%d,%d Q%d,0 %d,0 L0,0 L0,%d Z" fill="%s"/>'
+                 '<path d="M%g,%d L%g,%d Q%g,0.5 %d,0.5 L0,0.5" fill="none" '
+                 'stroke="%s" stroke-width="1"/></g>'
+                 % (prefix, oy, CORNER, TITLE_H, CORNER, r, CORNER, CORNER - r, TITLE_H, title_bg,
+                    CORNER - 0.5, TITLE_H, CORNER - 0.5, r, CORNER - 0.5, CORNER - r, contour))
+    g.append(tile(16, oy, TILE, TITLE_H, prefix + "-top", [
+        (0, 0, TILE, TITLE_H, title_bg), (0, 0, TILE, 1, contour)]))
+    side = [] if maximized else [(0, 0, 1, TILE, contour)]
+    g.append(tile(0, oy + 40, EDGE, TILE, prefix + "-left", [(0, 0, EDGE, TILE, BLACK)] + side))
+    g.append('<g id="%s-center"><rect x="16" y="%d" width="%d" height="%d" '
+             'fill="none" fill-opacity="0"/></g>' % (prefix, oy + 40, TILE, TILE))
+    side = [] if maximized else [(EDGE - 1, 0, 1, TILE, contour)]
+    g.append(tile(32, oy + 40, EDGE, TILE, prefix + "-right", [(0, 0, EDGE, TILE, BLACK)] + side))
+    bottom = [] if maximized else [(0, EDGE - 1, CORNER, 1, contour)]
+    g.append(tile(0, oy + 56, CORNER, EDGE, prefix + "-bottomleft",
+                  [(0, 0, CORNER, EDGE, BLACK)] + bottom + ([] if maximized else [(0, 0, 1, EDGE, contour)])))
+    g.append(tile(16, oy + 56, TILE, EDGE, prefix + "-bottom",
+                  [(0, 0, TILE, EDGE, BLACK)] + ([] if maximized else [(0, EDGE - 1, TILE, 1, contour)])))
+    g.append(tile(32, oy + 56, CORNER, EDGE, prefix + "-bottomright",
+                  [(0, 0, CORNER, EDGE, BLACK)] + bottom + ([] if maximized else [(CORNER - 1, 0, 1, EDGE, contour)])))
+    return "".join(g)
+
+
+def decoration():
+    sets = [
+        ("decoration", 0, ORANGE, TITLE, False),
+        ("decoration-inactive", 80, DIM_ORANGE, BLACK, False),
+        ("decoration-maximized", 160, ORANGE, TITLE, True),
+        ("decoration-maximized-inactive", 240, DIM_ORANGE, BLACK, True),
+    ]
+    body = "".join(frame_set(*args) for args in sets)
+    w, h = 48, 320
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" '
-            'viewBox="0 0 %d %d">%s</svg>\n' % (w, h, w, h, "".join(g)))
+            'viewBox="0 0 %d %d">%s</svg>\n' % (w, h, w, h, body))
 
 
 def button(glyph, hover_fill=None):

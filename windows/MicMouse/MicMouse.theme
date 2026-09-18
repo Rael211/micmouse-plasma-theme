@@ -1,0 +1,38 @@
+[Theme]
+DisplayName=MicMouse (Microphone and Mouse)
+ThemeId={7a3c2f0e-6f1b-4c1a-9c0d-micmouse00001}
+
+[Control Panel\Desktop]
+Wallpaper=%LocalAppData%\MicMouse\wallpaper.jpg
+TileWallpaper=0
+WallpaperStyle=10
+
+[VisualStyles]
+Path=%SystemRoot%\resources\Themes\Aero\Aero.msstyles
+ColorStyle=NormalColor
+Size=NormalSize
+AutoColorization=0
+ColorizationColor=0XC4FF6600
+SystemMode=Dark
+AppMode=Dark
+
+[Control Panel\Cursors]
+Arrow=%LocalAppData%\MicMouse\cursors\arrow.cur
+Help=%LocalAppData%\MicMouse\cursors\help.cur
+AppStarting=%LocalAppData%\MicMouse\cursors\appstarting.ani
+Wait=%LocalAppData%\MicMouse\cursors\wait.ani
+Crosshair=%LocalAppData%\MicMouse\cursors\crosshair.cur
+IBeam=%LocalAppData%\MicMouse\cursors\ibeam.cur
+NWPen=%LocalAppData%\MicMouse\cursors\nwpen.cur
+No=%LocalAppData%\MicMouse\cursors\no.cur
+SizeNS=%LocalAppData%\MicMouse\cursors\sizens.cur
+SizeWE=%LocalAppData%\MicMouse\cursors\sizewe.cur
+SizeNWSE=%LocalAppData%\MicMouse\cursors\sizenwse.cur
+SizeNESW=%LocalAppData%\MicMouse\cursors\sizenesw.cur
+SizeAll=%LocalAppData%\MicMouse\cursors\sizeall.cur
+UpArrow=%LocalAppData%\MicMouse\cursors\uparrow.cur
+Hand=%LocalAppData%\MicMouse\cursors\hand.cur
+DefaultValue=MicMouse
+
+[MasterThemeSelector]
+MTSM=RJSPBS

@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "Wallpaper/Images",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "meteoclock@obla.us",
+                "Name": "Orlin Chotev"
+            }
+        ],
+        "Id": "micmouse",
+        "License": "GPL-3.0-or-later",
+        "Name": "Микрофон и мишка",
+        "Name[en]": "Microphone and Mouse"
+    }
+}

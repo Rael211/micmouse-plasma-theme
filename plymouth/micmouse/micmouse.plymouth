@@ -1,0 +1,44 @@
+[Plymouth Theme]
+Name=Микрофон и мишка
+Description=Black boot splash with an orange spinner
+ModuleName=two-step
+
+[two-step]
+Font=Cantarell 12
+TitleFont=Cantarell Light 30
+ImageDir=/usr/share/plymouth/themes/micmouse
+DialogHorizontalAlignment=.5
+DialogVerticalAlignment=.5
+TitleHorizontalAlignment=.5
+TitleVerticalAlignment=.382
+HorizontalAlignment=.5
+VerticalAlignment=.62
+WatermarkHorizontalAlignment=.5
+WatermarkVerticalAlignment=.36
+Transition=none
+TransitionDuration=0.0
+BackgroundStartColor=0x14110d
+BackgroundEndColor=0x14110d
+ProgressBarBackgroundColor=0x3a2f24
+ProgressBarForegroundColor=0xff6600
+DialogClearsFirmwareBackground=true
+MessageBelowAnimation=true
+
+[boot-up]
+UseEndAnimation=false
+UseFirmwareBackground=false
+
+[shutdown]
+UseEndAnimation=false
+UseFirmwareBackground=false
+
+[reboot]
+UseEndAnimation=false
+UseFirmwareBackground=false
+
+[updates]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Updating...
+SubTitle=Do not turn off your computer

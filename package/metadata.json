@@ -1,0 +1,18 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "meteoclock@obla.us",
+                "Name": "Orlin Chotev"
+            }
+        ],
+        "Description": "Black and orange global theme in the colours of the Микрофон и мишка podcast. Breeze Dark underneath, repainted in #ff6600.",
+        "Description[bg]": "Черно-оранжева глобална тема в цветовете на подкаста „Микрофон и мишка“. Breeze Dark отдолу, пребоядисан в #ff6600.",
+        "Id": "us.obla.micmouse.dark",
+        "License": "GPL-3.0-or-later",
+        "Name": "Микрофон и мишка",
+        "Version": "1.0",
+        "Website": "https://micmouse.net"
+    }
+}

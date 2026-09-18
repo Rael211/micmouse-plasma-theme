@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Микрофон и мишка
+Comment=Black frame with a thin orange contour
+X-KDE-PluginInfo-Author=Orlin Chotev
+X-KDE-PluginInfo-Email=meteoclock@obla.us
+X-KDE-PluginInfo-Name=MicMouse
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-Website=https://micmouse.net
+X-KDE-PluginInfo-License=GPL-3.0-or-later
+X-KDE-ServiceTypes=KWin/Decoration
+Type=Service

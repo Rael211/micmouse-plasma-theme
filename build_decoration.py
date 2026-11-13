@@ -23,43 +23,46 @@ def tile(x, y, w, h, eid, parts):
 def frame_set(prefix, oy, contour, title_bg, maximized=False):
     """One complete 9-piece set at vertical canvas offset oy.
 
-    maximized: square corners and no side contour, the way a maximised
-    window meets the screen edge; only the top line is kept."""
+    maximized: no contour at all — a maximised window meets the screen edge,
+    and a line there is a stripe, not an outline (Breeze drops its outline
+    too). Square corners."""
     r = 0 if maximized else 6
     g = []
     if maximized:
         g.append(tile(0, oy, CORNER, TITLE_H, prefix + "-topleft", [
-            (0, 0, CORNER, TITLE_H, title_bg), (0, 0, CORNER, 1, contour)]))
+            (0, 0, CORNER, TITLE_H, title_bg)]))
         g.append(tile(32, oy, CORNER, TITLE_H, prefix + "-topright", [
-            (0, 0, CORNER, TITLE_H, title_bg), (0, 0, CORNER, 1, contour)]))
+            (0, 0, CORNER, TITLE_H, title_bg)]))
     else:
-        g.append('<g id="%s-topleft" transform="translate(0,%d)">'
-                 '<path d="M0,%d L0,%d Q0,0 %d,0 L%d,0 L%d,%d Z" fill="%s"/>'
-                 '<path d="M0.5,%d L0.5,%d Q0.5,0.5 %d,0.5 L%d,0.5" fill="none" '
-                 'stroke="%s" stroke-width="1"/></g>'
-                 % (prefix, oy, TITLE_H, r, r, CORNER, CORNER, TITLE_H, title_bg,
-                    TITLE_H, r, r, CORNER, contour))
-        g.append('<g id="%s-topright" transform="translate(32,%d)">'
-                 '<path d="M%d,%d L%d,%d Q%d,0 %d,0 L0,0 L0,%d Z" fill="%s"/>'
-                 '<path d="M%g,%d L%g,%d Q%g,0.5 %d,0.5 L0,0.5" fill="none" '
-                 'stroke="%s" stroke-width="1"/></g>'
-                 % (prefix, oy, CORNER, TITLE_H, CORNER, r, CORNER, CORNER - r, TITLE_H, title_bg,
-                    CORNER - 0.5, TITLE_H, CORNER - 0.5, r, CORNER - 0.5, CORNER - r, contour))
-    g.append(tile(16, oy, TILE, TITLE_H, prefix + "-top", [
-        (0, 0, TILE, TITLE_H, title_bg), (0, 0, TILE, 1, contour)]))
-    side = [] if maximized else [(0, 0, 1, TILE, contour)]
+        # Aurorae squeezes the 8px corner tiles into the 3px frame (x0.375) and the
+        # 4px edge tiles into 3px (x0.75); contour widths are pre-compensated so
+        # the line stays 1px and continuous from titlebar to side.
+        g.append(tile(0, oy, CORNER, TITLE_H, prefix + "-topleft", [
+            (0, 0, CORNER, TITLE_H, title_bg), (0, 0, CORNER, 1, contour), (0, 0, 2.67, TITLE_H, contour)]))
+        g.append(tile(32, oy, CORNER, TITLE_H, prefix + "-topright", [
+            (0, 0, CORNER, TITLE_H, title_bg), (0, 0, CORNER, 1, contour), (CORNER - 2.67, 0, 2.67, TITLE_H, contour)]))
+    g.append(tile(16, oy, TILE, TITLE_H, prefix + "-top",
+                  [(0, 0, TILE, TITLE_H, title_bg)] + ([] if maximized else [(0, 0, TILE, 1, contour)])))
+    side = [] if maximized else [(0, 0, 1.33, TILE, contour)]
     g.append(tile(0, oy + 40, EDGE, TILE, prefix + "-left", [(0, 0, EDGE, TILE, BLACK)] + side))
-    g.append('<g id="%s-center"><rect x="16" y="%d" width="%d" height="%d" '
-             'fill="none" fill-opacity="0"/></g>' % (prefix, oy + 40, TILE, TILE))
-    side = [] if maximized else [(EDGE - 1, 0, 1, TILE, contour)]
+    if maximized:
+        # Maximised windows: Aurorae disables every border and paints the whole
+        # titlebar from the centre element stretched, so here it must be the
+        # opaque titlebar strip, contour line on top.
+        g.append(tile(24, oy, TILE, TITLE_H, prefix + "-center", [
+            (0, 0, TILE, TITLE_H, title_bg)]))
+    else:
+        g.append('<g id="%s-center"><rect x="16" y="%d" width="%d" height="%d" '
+                 'fill="none" fill-opacity="0"/></g>' % (prefix, oy + 40, TILE, TILE))
+    side = [] if maximized else [(EDGE - 1.33, 0, 1.33, TILE, contour)]
     g.append(tile(32, oy + 40, EDGE, TILE, prefix + "-right", [(0, 0, EDGE, TILE, BLACK)] + side))
     bottom = [] if maximized else [(0, EDGE - 1, CORNER, 1, contour)]
     g.append(tile(0, oy + 56, CORNER, EDGE, prefix + "-bottomleft",
-                  [(0, 0, CORNER, EDGE, BLACK)] + bottom + ([] if maximized else [(0, 0, 1, EDGE, contour)])))
+                  [(0, 0, CORNER, EDGE, BLACK)] + bottom + ([] if maximized else [(0, 0, 2.67, EDGE, contour)])))
     g.append(tile(16, oy + 56, TILE, EDGE, prefix + "-bottom",
                   [(0, 0, TILE, EDGE, BLACK)] + ([] if maximized else [(0, EDGE - 1, TILE, 1, contour)])))
     g.append(tile(32, oy + 56, CORNER, EDGE, prefix + "-bottomright",
-                  [(0, 0, CORNER, EDGE, BLACK)] + bottom + ([] if maximized else [(CORNER - 1, 0, 1, EDGE, contour)])))
+                  [(0, 0, CORNER, EDGE, BLACK)] + bottom + ([] if maximized else [(CORNER - 2.67, 0, 2.67, EDGE, contour)])))
     return "".join(g)
 
 
@@ -81,24 +84,24 @@ def button(glyph, hover_fill=None):
     """glyph(colour) -> svg fragment drawn in a 16x16 box at the origin.
 
     Breeze puts the symbol in the titlebar colour and fills a circle behind it
-    on hover; the symbol then flips to the dark background colour."""
+    on hover; the symbol then flips to the dark background colour.
+
+    All states sit on top of each other in ONE 16x16 document. Plasma's Svg
+    renders a state by element id, so stacking costs nothing, while a wide
+    document with the states side by side made KWin 6.7 size the buttons from
+    the document and overlap them."""
     states = [("active-center", ORANGE, None), ("inactive-center", DIM_ORANGE, None),
               ("hover-center", BLACK, hover_fill or ORANGE),
               ("pressed-center", BLACK, HOVER),
               ("deactivated-center", MUTED, None)]
     g = []
-    for i, (eid, colour, fill) in enumerate(states):
-        x = i * 24
+    for eid, colour, fill in states:
         disc = ('<circle cx="8" cy="8" r="8" fill="%s"/>' % fill) if fill else ""
-        # Every state must have the same bounding box: Aurorae scales each one
-        # to the button size, so a bare glyph (8x8 of ink) was blown up to twice
-        # the size of the hover state, which carries a full-box circle.
         box = '<rect x="0" y="0" width="16" height="16" fill="#000000" fill-opacity="0"/>'
-        g.append('<g id="%s" transform="translate(%d,0)">%s%s%s</g>'
-                 % (eid, x, box, disc, glyph(colour)))
+        g.append('<g id="%s">%s%s%s</g>' % (eid, box, disc, glyph(colour)))
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="16" '
-            'viewBox="0 0 %d 16">%s</svg>\n' % (len(states) * 24, len(states) * 24, "".join(g)))
+            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" '
+            'viewBox="0 0 16 16">%s</svg>\n' % "".join(g))
 
 
 def stroke(d, colour, width=2):
@@ -127,6 +130,9 @@ for name, glyph in GLYPHS.items():
     svg = button(glyph, hover_fill=CLOSE if name == "close" else None)
     open(os.path.join(OUT, "%s.svg" % name), "w").write(svg)
 
+# Aurorae buttons are fixed pixel boxes; at 6 px spacing they overlapped on an
+# openSUSE box at a different display scale (2026-09-25), 12 px holds there
+# and on the 200% ProArt screen.
 open(os.path.join(OUT, "MicMouserc"), "w").write("""[General]
 ActiveTextColor=244,239,230
 InactiveTextColor=156,146,135
@@ -144,9 +150,9 @@ BorderLeft=3
 BorderRight=3
 ButtonHeight=16
 ButtonMarginTop=8
-ButtonSpacing=6
+ButtonSpacing=12
 ButtonWidth=16
-ExplicitButtonSpacer=6
+ExplicitButtonSpacer=12
 PaddingBottom=0
 PaddingLeft=0
 PaddingRight=0
@@ -154,9 +160,13 @@ PaddingTop=0
 TitleBorderLeft=8
 TitleBorderRight=8
 TitleEdgeBottom=0
+TitleEdgeBottomMaximized=0
 TitleEdgeLeft=3
+TitleEdgeLeftMaximized=3
 TitleEdgeRight=3
+TitleEdgeRightMaximized=3
 TitleEdgeTop=0
+TitleEdgeTopMaximized=0
 TitleHeight=32
 """)
 
